@@ -116,6 +116,8 @@ public class World extends FlxGroup {
     private boolean playerMoving;
     private boolean levelCompleted;
 
+    private int steps;
+
     private LevelEventCallback callback;
 
     public World(LevelEventCallback callback) {
@@ -183,6 +185,10 @@ public class World extends FlxGroup {
         }
     }
 
+    public void forceCallbackPushInfo() {
+        notifyCallbackSteps();
+    }
+
     @Override
     public void postUpdate() {
         super.postUpdate();
@@ -198,6 +204,10 @@ public class World extends FlxGroup {
 
     public boolean isLevelCompleted() {
         return levelCompleted;
+    }
+
+    public int getSteps() {
+        return steps;
     }
 
     private boolean checkBoxesPlaced() {
@@ -251,12 +261,21 @@ public class World extends FlxGroup {
                             }
                         }
                     });
+
+            steps++;
+            notifyCallbackSteps();
         } else {
             updatePlayerSprite();
         }
 
         player.velocity.x = 0;
         player.velocity.y = 0;
+    }
+
+    private void notifyCallbackSteps() {
+        if (callback != null) {
+            callback.onStepsChanged(steps);
+        }
     }
 
     private void updatePlayerSprite() {

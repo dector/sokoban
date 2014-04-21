@@ -28,4 +28,5 @@ package io.github.dector.sokoban.level;
 public interface LevelEventCallback {
 
     public void onLevelCompleted();
+    public void onStepsChanged(int steps);
 }
