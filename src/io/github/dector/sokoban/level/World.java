@@ -31,6 +31,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import io.github.dector.sokoban.util.Log;
+import io.github.dector.sokoban.util.Settings;
 import org.flixel.*;
 import org.flixel.plugin.tweens.TweenPlugin;
 import org.flixel.plugin.tweens.TweenSprite;
@@ -139,17 +140,19 @@ public class World extends FlxGroup {
             String objName = obj.getName();
 
             if ("Player".equals(objName)) {
-                player.loadGraphic("assets/player.png", true);
-                player.addAnimation("stand_down", new int[]{0}, 0, false);
-                player.addAnimation("walk_down", new int[] { 1, 2 }, 2, true);
-                player.addAnimation("stand_left", new int[] { 3 }, 0, false);
-                player.addAnimation("walk_left", new int[] { 4, 5 }, 2, true);
-                player.addAnimation("stand_right", new int[] { 6 }, 0, false);
-                player.addAnimation("walk_right", new int[] { 7, 8 }, 2, true);
-                player.addAnimation("stand_up", new int[] { 9 }, 0, false);
-                player.addAnimation("walk_up", new int[]{10, 11}, 2, true);
+                player.loadGraphic(Settings.PLAYER_SKIN.getAssetFile(), true, false, TILE_SIZE);
+                player.addAnimation("stand_down", new int[]{0, 8,}, 1, true);
+                player.addAnimation("walk_down",    new int[]{  1,  9, 17,    }, 3, true);
+                player.addAnimation("stand_left",   new int[]{  2, 10,        }, 1, true);
+                player.addAnimation("walk_left",    new int[]{  3, 11, 19,    }, 3, true);
+                player.addAnimation("stand_right",  new int[]{  4, 12,        }, 1, true);
+                player.addAnimation("walk_right",   new int[]{  5, 13, 21,    }, 3, true);
+                player.addAnimation("stand_up",     new int[]{  6, 14,        }, 1, true);
+                player.addAnimation("walk_up",      new int[]{  7, 15, 23,    }, 3, true);
                 player.x = ((RectangleMapObject) obj).getRectangle().getX();
                 player.y = ((RectangleMapObject) obj).getRectangle().getY() - TILE_SIZE;
+                player.setFacing(FlxObject.DOWN);
+                updatePlayerSprite();
             } else if ("Box".equals(objName)) {
                 FlxSprite box = new FlxSprite();
                 box.loadGraphic("assets/box.png");

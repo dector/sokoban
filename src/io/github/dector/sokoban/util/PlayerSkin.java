@@ -25,15 +25,17 @@
  */
 package io.github.dector.sokoban.util;
 
-public class Settings {
+public enum PlayerSkin {
 
-    // Debug
-    public static final boolean DEBUG_ENABLED = true;
-    public static final boolean LOG_ENABLED = DEBUG_ENABLED && false;
+    MAN("man.png");
 
-    // Graphics
-    public static final PlayerSkin PLAYER_SKIN = PlayerSkin.MAN;
+    public final String assetName;
 
-    // Controls
-    public static final boolean GAMEPAD_ENABLED = false;
+    PlayerSkin(String assetName) {
+        this.assetName = assetName;
+    }
+
+    public String getAssetFile() {
+        return "assets/player/" + assetName;
+    }
 }
