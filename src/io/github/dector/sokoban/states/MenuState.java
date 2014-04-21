@@ -90,7 +90,7 @@ public class MenuState extends FlxState {
 
     @Override
     public void create() {
-        FlxG.mouse.show();
+//        FlxG.mouse.show();
         // TODO draw circular gradient
         FlxG.setBgColor(0xff191919);
 
@@ -169,6 +169,7 @@ public class MenuState extends FlxState {
 
         private MenuButton(int x, int y, Item item) {
             super(x, y, 80, item.label);
+            setAlignment("center");
 
             setSelected(false);
             this.item = item;
