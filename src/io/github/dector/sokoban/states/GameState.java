@@ -29,6 +29,7 @@ import com.badlogic.gdx.Gdx;
 import io.github.dector.sokoban.level.World;
 import io.github.dector.sokoban.util.Input;
 import org.flixel.*;
+import org.flixel.plugin.tweens.TweenPlugin;
 
 public class GameState extends FlxState {
 
@@ -39,8 +40,12 @@ public class GameState extends FlxState {
     public void create() {
         FlxG.setBgColor(0xffaaaaaa);
 
+        FlxG.addPlugin(TweenPlugin.class);
+
         input = new Input();
         world = new World();
+
+        add(world);
     }
 
     @Override

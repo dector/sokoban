@@ -25,17 +25,17 @@
  */
 package io.github.dector.sokoban.level;
 
+import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import io.github.dector.sokoban.util.Log;
-import org.flixel.FlxGroup;
-import org.flixel.FlxObject;
-import org.flixel.FlxSprite;
-import org.flixel.FlxTilemap;
+import org.flixel.*;
+import org.flixel.plugin.tweens.TweenPlugin;
+import org.flixel.plugin.tweens.TweenSprite;
 
-public class World {
+public class World extends FlxGroup {
 
     public enum Tile {
         WALL(true), GRASS(false);
@@ -79,6 +79,21 @@ public class World {
                     return y;
             }
         }
+
+        public int getFacing() {
+            switch (this) {
+                case UP:
+                    return FlxObject.UP;
+                case DOWN:
+                    return FlxObject.DOWN;
+                case LEFT:
+                    return FlxObject.LEFT;
+                case RIGHT:
+                    return FlxObject.RIGHT;
+                default:
+                    return FlxObject.DOWN;
+            }
+        }
     }
 
     private static final int TILE_SIZE = 32;
@@ -96,6 +111,8 @@ public class World {
 
     private FlxTilemap level;
 
+    private boolean playerMoving;
+
     public World() {
         TmxMapLoader mapLoader = new TmxMapLoader();
         TmxMapLoader.Parameters params = new TmxMapLoader.Parameters();
@@ -106,26 +123,31 @@ public class World {
         level = new FlxTilemap();
         level.loadMap(FlxTilemap.tiledmapToCSV(map, "Background"), "assets/tiles.png",
                 TILE_SIZE, TILE_SIZE, FlxTilemap.OFF, TILEMAP_START_INDEX);
-
-        boxes = new FlxGroup();
-        boxesMap = new FlxObject[level.widthInTiles][level.heightInTiles];
+        add(level);
 
         holders = new FlxGroup();
+        add(holders);
+
+        boxes = new FlxGroup();
+        add(boxes);
+        boxesMap = new FlxObject[level.widthInTiles][level.heightInTiles];
+
+        player = new FlxSprite();
+        add(player);
 
         for (MapObject obj : map.getLayers().get("Objects").getObjects()) {
             String objName = obj.getName();
 
             if ("Player".equals(objName)) {
-                player = new FlxSprite();
                 player.loadGraphic("assets/player.png", true);
-                player.addAnimation("stand_down", new int[] { 0 }, 0, false);
-                player.addAnimation("walk_down", new int[] { 1, 2 }, 5, true);
+                player.addAnimation("stand_down", new int[]{0}, 0, false);
+                player.addAnimation("walk_down", new int[] { 1, 2 }, 2, true);
                 player.addAnimation("stand_left", new int[] { 3 }, 0, false);
-                player.addAnimation("walk_left", new int[] { 4, 5 }, 5, true);
+                player.addAnimation("walk_left", new int[] { 4, 5 }, 2, true);
                 player.addAnimation("stand_right", new int[] { 6 }, 0, false);
-                player.addAnimation("walk_right", new int[] { 7, 8 }, 5, true);
+                player.addAnimation("walk_right", new int[] { 7, 8 }, 2, true);
                 player.addAnimation("stand_up", new int[] { 9 }, 0, false);
-                player.addAnimation("walk_up", new int[] { 10, 11 }, 5, true);
+                player.addAnimation("walk_up", new int[]{10, 11}, 2, true);
                 player.x = ((RectangleMapObject) obj).getRectangle().getX();
                 player.y = ((RectangleMapObject) obj).getRectangle().getY() - TILE_SIZE;
             } else if ("Box".equals(objName)) {
@@ -145,17 +167,11 @@ public class World {
         }
     }
 
-    public void update() {
-    }
-
-    public void draw() {
-        level.draw();
-        holders.draw();
-        boxes.draw();
-        player.draw();
-    }
-
     public void tryMovePlayer(Direction direction) {
+        if (playerMoving) {
+            return;
+        }
+
         int tileX = (int) player.x / TILE_SIZE;
         int tileY = (int) player.y / TILE_SIZE;
         int nextX = direction.nextTileX(tileX);
@@ -163,35 +179,54 @@ public class World {
 
         boolean moved = tryMoveBox(nextX, nextY, direction, 1);
         if (moved) {
-            player.x = nextX * TILE_SIZE;
-            player.y = nextY * TILE_SIZE;
+            playerMoving = true;
+            player.velocity.x += nextX * TILE_SIZE;
+            player.velocity.y += nextY * TILE_SIZE;
         }
-
-        updatePlayer(direction);
+        startMovePlayer(direction);
     }
 
-    private void updatePlayer(Direction direction) {
-        switch (direction) {
-            case LEFT:
-                player.play("stand_left");
-                player.setFacing(FlxObject.LEFT);
+    private void startMovePlayer(Direction direction) {
+        player.setFacing(direction.getFacing());
+        updatePlayerSprite();
+
+        if (playerMoving) {
+            animateObjectMoving(player, (int) player.velocity.x, (int) player.velocity.y,
+                    new TweenCallback() {
+                        @Override
+                        public void onEvent(int event, BaseTween<?> baseTween) {
+                            if (event == TweenCallback.COMPLETE) {
+                                playerMoving = false;
+                                updatePlayerSprite();
+                            }
+                        }
+                    });
+        } else {
+            updatePlayerSprite();
+        }
+
+        player.velocity.x = 0;
+        player.velocity.y = 0;
+    }
+
+    private void updatePlayerSprite() {
+        switch (player.getFacing()) {
+            case FlxObject.LEFT:
+                player.play(playerMoving ? "walk_left" : "stand_left");
                 break;
-            case RIGHT:
-                player.play("stand_right");
-                player.setFacing(FlxObject.RIGHT);
+            case FlxObject.RIGHT:
+                player.play(playerMoving ? "walk_right" : "stand_right");
                 break;
-            case UP:
-                player.play("stand_up");
-                player.setFacing(FlxSprite.UP);
+            case FlxObject.UP:
+                player.play(playerMoving ? "walk_up" : "stand_up");
                 break;
-            case DOWN:
-                player.play("stand_down");
-                player.setFacing(FlxObject.DOWN);
+            case FlxObject.DOWN:
+                player.play(playerMoving ? "walk_down" : "stand_down");
                 break;
         }
     }
 
-    private boolean tryMoveBox(int currentX, int currentY, Direction direction, int indexInRow) {
+    private boolean tryMoveBox(final int currentX, final int currentY, Direction direction, int indexInRow) {
         boolean moved = false;
 
         Log.d("Trying to move %d:%d to %s", currentX, currentY, direction);
@@ -200,17 +235,17 @@ public class World {
         if (indexInRow <= MAX_BOXES_IN_ROW_PUSH
                 && ! isMapTileSolid(currentX, currentY)
                 && isBoxCoordsValid(currentX, currentY)) {
-            FlxObject currentBox = boxesMap[currentX][currentY];
+            final FlxObject currentBox = boxesMap[currentX][currentY];
 
             if (currentBox != null) {
-                int nextX = direction.nextTileX(currentX);
-                int nextY = direction.nextTileY(currentY);
+                final int nextX = direction.nextTileX(currentX);
+                final int nextY = direction.nextTileY(currentY);
 
                 Log.d("Next: %d:%d", nextX, nextY);
 
                 if (isBoxCoordsValid(nextX, nextY)
                         && ! isMapTileSolid(nextX, nextY)) {
-                    FlxObject nextBox = boxesMap[nextX][nextY];
+                    final FlxObject nextBox = boxesMap[nextX][nextY];
 
                     Log.d("Next object: %s", nextBox);
 
@@ -226,11 +261,17 @@ public class World {
                 }
 
                 if (moved) {
-                    currentBox.x = nextX * TILE_SIZE;
-                    currentBox.y = nextY * TILE_SIZE;
-
-                    boxesMap[nextX][nextY] = currentBox;
-                    boxesMap[currentX][currentY] = null;
+                    animateObjectMoving(currentBox, nextX * TILE_SIZE, nextY * TILE_SIZE,
+                            new TweenCallback() {
+                                @Override
+                                public void onEvent(int event, BaseTween<?> baseTween) {
+                                    if (event == TweenCallback.COMPLETE) {
+                                        boxesMap[nextX][nextY] = currentBox;
+                                        boxesMap[currentX][currentY] = null;
+                                    }
+                                }
+                            }
+                    );
                 }
             } else {
                 // Cheat
@@ -239,6 +280,14 @@ public class World {
         }
 
         return moved;
+    }
+
+    private void animateObjectMoving(FlxObject obj, int toX, int toY, TweenCallback callback) {
+        Tween.to(obj, TweenSprite.XY, .5f)
+                .target(toX, toY)
+                .setCallback(callback)
+                .ease(TweenEquations.easeNone)
+                .start(TweenPlugin.manager);
     }
 
     private boolean isBoxCoordsValid(int tileX, int tileY) {
