@@ -118,16 +118,22 @@ public class World extends FlxGroup {
 
     private int steps;
 
+    // For internal usage on.
+    // To avoid win condition check on every frame
+    private boolean tickStepsChanged;
+
     private LevelEventCallback callback;
 
     public World(LevelEventCallback callback) {
         this.callback = callback;
+    }
 
+    public void init(String pathToLevel) {
         TmxMapLoader mapLoader = new TmxMapLoader();
         TmxMapLoader.Parameters params = new TmxMapLoader.Parameters();
         params.yUp = false;
 
-        TiledMap map = mapLoader.load("assets/levels/level0.tmx", params);
+        TiledMap map = mapLoader.load(pathToLevel, params);
 
         level = new FlxTilemap();
         level.loadMap(FlxTilemap.tiledmapToCSV(map, "Background"), "assets/tiles.png",
@@ -143,6 +149,8 @@ public class World extends FlxGroup {
 
         player = new FlxSprite();
         add(player);
+
+        FlxG.camera.follow(player, FlxCamera.STYLE_TOPDOWN_TIGHT);
 
         for (MapObject obj : map.getLayers().get("Objects").getObjects()) {
             String objName = obj.getName();
@@ -186,19 +194,21 @@ public class World extends FlxGroup {
     }
 
     public void forceCallbackPushInfo() {
-        notifyCallbackSteps();
+        onStepsChanged();
     }
 
     @Override
     public void postUpdate() {
         super.postUpdate();
 
-        if (! levelCompleted && checkBoxesPlaced()) {
+        if (tickStepsChanged && checkBoxesPlaced()) {
             levelCompleted = true;
 
             if (callback != null) {
                 callback.onLevelCompleted();
             }
+
+            tickStepsChanged = false;
         }
     }
 
@@ -263,7 +273,8 @@ public class World extends FlxGroup {
                     });
 
             steps++;
-            notifyCallbackSteps();
+            tickStepsChanged = true;
+            onStepsChanged();
         } else {
             updatePlayerSprite();
         }
@@ -272,7 +283,7 @@ public class World extends FlxGroup {
         player.velocity.y = 0;
     }
 
-    private void notifyCallbackSteps() {
+    private void onStepsChanged() {
         if (callback != null) {
             callback.onStepsChanged(steps);
         }

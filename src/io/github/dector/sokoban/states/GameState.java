@@ -30,6 +30,8 @@ import io.github.dector.sokoban.SokobanGame;
 import io.github.dector.sokoban.level.LevelEventCallback;
 import io.github.dector.sokoban.level.World;
 import io.github.dector.sokoban.util.Input;
+import io.github.dector.sokoban.util.LevelSet;
+import io.github.dector.sokoban.util.Settings;
 import org.flixel.*;
 import org.flixel.plugin.tweens.TweenPlugin;
 import org.flixel.plugin.tweens.TweenSprite;
@@ -39,10 +41,17 @@ public class GameState extends FlxState implements LevelEventCallback {
     private Input input;
     private World world;
 
+    private FlxGroup levelDoneGroup;
     private FlxSprite fadeForeground;
     private FlxText winText;
 
     private FlxText uiText;
+
+    private LevelSet levelSet;
+
+    public GameState(LevelSet levelSet) {
+        this.levelSet = levelSet;
+    }
 
     @Override
     public void create() {
@@ -52,21 +61,27 @@ public class GameState extends FlxState implements LevelEventCallback {
 
         input = new Input();
         world = new World(this);
+        world.init(levelSet.getCurrent());
 
         add(world);
 
         uiText = new FlxText(10, 10, 100);
+        uiText.scrollFactor.make(0, 0);
         add(uiText);
+
+        levelDoneGroup = new FlxGroup(2);
+        levelDoneGroup.visible = false;
+        add(levelDoneGroup);
 
         fadeForeground = new FlxSprite();
         fadeForeground.makeGraphic(FlxG.screenWidth, FlxG.screenHeight, 0xff000000);
-        fadeForeground.visible = false;
-        add(fadeForeground);
+        fadeForeground.scrollFactor.make(0, 0);
+        levelDoneGroup.add(fadeForeground);
 
         winText = new FlxText(0, 100, 400, "WIN!!!");
         winText.setFormat(null, 85, 0xffff0000, "center");
-        winText.visible = false;
-        add(winText);
+        winText.scrollFactor.make(0, 0);
+        levelDoneGroup.add(winText);
 
         world.forceCallbackPushInfo();
     }
@@ -76,7 +91,8 @@ public class GameState extends FlxState implements LevelEventCallback {
         super.update();
 
         if (FlxG.keys.R) {
-            FlxG.resetState();
+//            FlxG.resetState();
+            create();
         }
         if (FlxG.keys.ESCAPE) {
             SokobanGame.exit();
@@ -98,14 +114,27 @@ public class GameState extends FlxState implements LevelEventCallback {
             FlxG.debug = ! FlxG.debug;
             FlxG.visualDebug = ! FlxG.visualDebug;
         }
+        if (input.actionPressed() && world.isLevelCompleted()) {
+            nextLevel();
+        }
+    }
+
+    private void nextLevel() {
+        if (levelSet.hasMore()) {
+            levelDoneGroup.visible = false;
+            TweenPlugin.manager.killAll();
+            levelSet.next();
+            create();
+        } else {
+            FlxG.switchState(new MenuState());
+        }
     }
 
     @Override
     public void onLevelCompleted() {
-        fadeForeground.visible = true;
-        fadeForeground.setAlpha(0);
+        levelDoneGroup.visible = true;
 
-        winText.visible = true;
+        fadeForeground.setAlpha(0);
         winText.scale.make(.1f, .1f);
 
         Timeline.createParallel()
@@ -120,7 +149,6 @@ public class GameState extends FlxState implements LevelEventCallback {
                             @Override
                             public void onEvent(int type, BaseTween<?> baseTween) {
                                 if (type == COMPLETE) {
-                                    winText.visible = true;
                                     Tween.to(winText, TweenSprite.SCALE_XY, .75f)
                                             .target(1, 1)
                                             .ease(TweenEquations.easeInOutSine)

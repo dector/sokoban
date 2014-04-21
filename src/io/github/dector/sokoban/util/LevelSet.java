@@ -25,31 +25,55 @@
  */
 package io.github.dector.sokoban.util;
 
-import org.flixel.FlxG;
+import com.badlogic.gdx.files.FileHandle;
+import org.flixel.system.gdx.loaders.FlxFileHandleResolver;
 
-public class Input {
+import java.util.ArrayList;
+import java.util.List;
 
-    public boolean leftPressed() {
-        return FlxG.keys.LEFT;
+public class LevelSet {
+
+    private List<String> levels = new ArrayList<String>();
+
+    private int selectedLevelIndex = 0;
+
+    public static LevelSet fromDir(String path) {
+        FileHandle dir = new FlxFileHandleResolver().resolve(path);
+
+        if (! dir.exists()) {
+            return null;
+        }
+        if (! dir.isDirectory()) {
+            return null;
+        }
+
+        LevelSet levelSet = new LevelSet();
+
+        for (FileHandle file : dir.list(".tmx")) {
+            if (! file.isDirectory()) {
+                String levelPath = path + (path.endsWith("/") ? "" : "/") + file.name();
+                levelSet.levels.add(levelPath);
+            }
+        }
+
+        return levelSet;
     }
 
-    public boolean rightPressed() {
-        return FlxG.keys.RIGHT;
+    public List<String> getList() {
+        return levels;
     }
 
-    public boolean upPressed() {
-        return FlxG.keys.UP;
+    public boolean hasMore() {
+        return levels.size() > 0
+                && selectedLevelIndex < levels.size() - 1;
     }
 
-    public boolean downPressed() {
-        return FlxG.keys.DOWN;
+    public String next() {
+        selectedLevelIndex++;
+        return getCurrent();
     }
 
-    public boolean actionPressed() {
-        return FlxG.keys.justPressed("X");
-    }
-
-    public boolean isDebugPressed() {
-        return FlxG.keys.justPressed("F2");
+    public String getCurrent() {
+        return levels.get(selectedLevelIndex);
     }
 }

@@ -29,6 +29,7 @@ import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenEquations;
 import io.github.dector.sokoban.SokobanGame;
 import io.github.dector.sokoban.util.ColorUtils;
+import io.github.dector.sokoban.util.LevelSet;
 import io.github.dector.sokoban.util.SpriteColorAccessor;
 import io.github.dector.sokoban.util.Input;
 import org.flixel.*;
@@ -45,7 +46,8 @@ public class MenuState extends FlxState {
                 FlxG.fade(0xff000000, .5f, new IFlxCamera() {
                     @Override
                     public void callback() {
-                        FlxG.switchState(new GameState());
+                        LevelSet levelSet = LevelSet.fromDir("assets/levels/");
+                        FlxG.switchState(new GameState(levelSet));
                     }
                 });
             }
@@ -90,7 +92,6 @@ public class MenuState extends FlxState {
 
     @Override
     public void create() {
-//        FlxG.mouse.show();
         // TODO draw circular gradient
         FlxG.setBgColor(0xff191919);
 

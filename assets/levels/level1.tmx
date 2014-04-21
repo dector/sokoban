@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="20" height="20" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="tiles" tilewidth="32" tileheight="32">
+  <image source="../tiles.png" width="256" height="64"/>
+ </tileset>
+ <layer name="Background" width="20" height="20">
+  <data encoding="csv">
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,2,2,2,2,2,2,2,1,2,2,1,2,2,2,2,2,2,2,1,
+1,2,2,2,2,2,2,2,1,2,2,1,2,2,1,1,2,2,2,1,
+1,2,2,2,2,2,2,2,1,2,2,1,2,2,1,2,2,2,2,1,
+1,2,2,1,1,1,1,2,2,2,2,2,2,2,1,2,2,2,2,1,
+1,2,2,2,2,2,1,2,2,2,2,2,2,2,1,2,1,1,1,1,
+1,2,2,2,2,2,1,1,2,2,1,2,1,2,2,2,1,2,1,1,
+1,2,1,1,1,2,1,2,1,2,1,1,1,2,2,1,1,2,2,1,
+1,2,2,2,1,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,
+1,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,2,1,1,
+1,2,2,2,1,2,1,1,2,2,2,2,2,2,2,2,2,2,1,1,
+1,2,2,1,2,2,2,2,1,2,2,2,2,2,1,1,1,1,1,1,
+1,1,1,1,1,2,2,2,2,1,2,2,2,2,2,2,2,2,2,1,
+1,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,1,
+1,2,2,2,2,2,2,2,2,1,2,2,2,2,1,1,1,2,2,1,
+1,2,2,2,2,2,2,2,1,2,1,2,2,2,2,2,2,1,2,1,
+1,2,2,2,2,2,2,2,1,2,2,2,2,2,2,1,1,2,2,1,
+1,2,2,2,2,2,2,2,2,1,1,2,2,2,1,2,2,2,2,1,
+1,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+</data>
+ </layer>
+ <objectgroup name="Objects" width="20" height="20">
+  <object name="Player" gid="5" x="288" y="320"/>
+  <object name="Holder" gid="3" x="288" y="96"/>
+  <object name="Holder" gid="3" x="544" y="352"/>
+  <object name="Holder" gid="3" x="64" y="352"/>
+  <object name="Holder" gid="3" x="256" y="576"/>
+  <object name="Holder" gid="3" x="384" y="576"/>
+  <object name="Holder" gid="3" x="160" y="192"/>
+  <object name="Holder" gid="3" x="544" y="224"/>
+  <object name="Holder" gid="3" x="352" y="416"/>
+  <object name="Holder" gid="3" x="352" y="224"/>
+  <object name="Holder" gid="3" x="544" y="544"/>
+  <object name="Holder" gid="3" x="96" y="512"/>
+  <object name="Holder" gid="3" x="320" y="96"/>
+  <object name="Holder" gid="3" x="544" y="96"/>
+  <object name="Box" gid="4" x="288" y="160"/>
+  <object name="Box" gid="4" x="320" y="160"/>
+  <object name="Box" gid="4" x="128" y="128"/>
+  <object name="Box" gid="4" x="128" y="320"/>
+  <object name="Box" gid="4" x="512" y="128"/>
+  <object name="Box" gid="4" x="320" y="192"/>
+  <object name="Box" gid="4" x="384" y="288"/>
+  <object name="Box" gid="4" x="352" y="512"/>
+  <object name="Box" gid="4" x="512" y="576"/>
+  <object name="Box" gid="4" x="480" y="352"/>
+  <object name="Box" gid="4" x="128" y="544"/>
+  <object name="Box" gid="4" x="128" y="576"/>
+  <object name="Box" gid="4" x="160" y="416"/>
+ </objectgroup>
+</map>
