@@ -25,12 +25,17 @@
  */
 package io.github.dector.sokoban;
 
-import io.github.dector.sokoban.states.GameState;
+import com.badlogic.gdx.Gdx;
+import io.github.dector.sokoban.util.Settings;
 import org.flixel.FlxGame;
 
 public class SokobanGame extends FlxGame {
 
     public SokobanGame() {
-        super(400, 300, GameState.class);
+        super(400, 300, Settings.START_STATE);
+    }
+
+    public static void exit() {
+        Gdx.app.exit();
     }
 }

@@ -44,4 +44,8 @@ public class Input {
     public boolean downPressed() {
         return FlxG.keys.justPressed("DOWN");
     }
+
+    public boolean isDebugPressed() {
+        return FlxG.keys.justPressed("F2");
+    }
 }

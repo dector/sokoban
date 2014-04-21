@@ -26,7 +26,7 @@
 package io.github.dector.sokoban.states;
 
 import aurelienribon.tweenengine.*;
-import com.badlogic.gdx.Gdx;
+import io.github.dector.sokoban.SokobanGame;
 import io.github.dector.sokoban.level.LevelEventCallback;
 import io.github.dector.sokoban.level.World;
 import io.github.dector.sokoban.util.Input;
@@ -79,7 +79,7 @@ public class GameState extends FlxState implements LevelEventCallback {
             FlxG.resetState();
         }
         if (FlxG.keys.ESCAPE) {
-            Gdx.app.exit();
+            SokobanGame.exit();
         }
 
         if (input.leftPressed()) {
@@ -93,6 +93,10 @@ public class GameState extends FlxState implements LevelEventCallback {
         }
         if (input.downPressed()) {
             world.tryMovePlayer(World.Direction.DOWN);
+        }
+        if (input.isDebugPressed()) {
+            FlxG.debug = ! FlxG.debug;
+            FlxG.visualDebug = ! FlxG.visualDebug;
         }
     }
 

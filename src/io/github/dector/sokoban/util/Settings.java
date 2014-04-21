@@ -25,11 +25,16 @@
  */
 package io.github.dector.sokoban.util;
 
+import io.github.dector.sokoban.states.MenuState;
+import org.flixel.FlxState;
+
 public class Settings {
 
     // Debug
     public static final boolean DEBUG_ENABLED = true;
     public static final boolean LOG_ENABLED = DEBUG_ENABLED && false;
+
+    public static final Class<? extends FlxState> START_STATE = MenuState.class;
 
     // Graphics
     public static final PlayerSkin PLAYER_SKIN = PlayerSkin.PANK;
