@@ -114,8 +114,13 @@ public class World extends FlxGroup {
     private FlxTilemap level;
 
     private boolean playerMoving;
+    private boolean levelCompleted;
 
-    public World() {
+    private LevelEventCallback callback;
+
+    public World(LevelEventCallback callback) {
+        this.callback = callback;
+
         TmxMapLoader mapLoader = new TmxMapLoader();
         TmxMapLoader.Parameters params = new TmxMapLoader.Parameters();
         params.yUp = false;
@@ -182,10 +187,17 @@ public class World extends FlxGroup {
     public void postUpdate() {
         super.postUpdate();
 
-        if (checkBoxesPlaced()) {
-            // WIN
-            Log.d("Win!");
+        if (! levelCompleted && checkBoxesPlaced()) {
+            levelCompleted = true;
+
+            if (callback != null) {
+                callback.onLevelCompleted();
+            }
         }
+    }
+
+    public boolean isLevelCompleted() {
+        return levelCompleted;
     }
 
     private boolean checkBoxesPlaced() {
@@ -204,6 +216,9 @@ public class World extends FlxGroup {
 
     public void tryMovePlayer(Direction direction) {
         if (playerMoving) {
+            return;
+        }
+        if (levelCompleted) {
             return;
         }
 

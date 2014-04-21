@@ -23,17 +23,9 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package io.github.dector.sokoban.util;
+package io.github.dector.sokoban.level;
 
-public class Settings {
+public interface LevelEventCallback {
 
-    // Debug
-    public static final boolean DEBUG_ENABLED = true;
-    public static final boolean LOG_ENABLED = DEBUG_ENABLED && false;
-
-    // Graphics
-    public static final PlayerSkin PLAYER_SKIN = PlayerSkin.PANK;
-
-    // Controls
-    public static final boolean GAMEPAD_ENABLED = false;
+    public void onLevelCompleted();
 }

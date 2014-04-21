@@ -25,16 +25,22 @@
  */
 package io.github.dector.sokoban.states;
 
+import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.Gdx;
+import io.github.dector.sokoban.level.LevelEventCallback;
 import io.github.dector.sokoban.level.World;
 import io.github.dector.sokoban.util.Input;
 import org.flixel.*;
 import org.flixel.plugin.tweens.TweenPlugin;
+import org.flixel.plugin.tweens.TweenSprite;
 
-public class GameState extends FlxState {
+public class GameState extends FlxState implements LevelEventCallback {
 
     private Input input;
     private World world;
+
+    private FlxSprite fadeForeground;
+    private FlxText winText;
 
     @Override
     public void create() {
@@ -43,9 +49,19 @@ public class GameState extends FlxState {
         FlxG.addPlugin(TweenPlugin.class);
 
         input = new Input();
-        world = new World();
+        world = new World(this);
 
         add(world);
+
+        fadeForeground = new FlxSprite();
+        fadeForeground.makeGraphic(FlxG.screenWidth, FlxG.screenHeight, 0xff000000);
+        fadeForeground.visible = false;
+        add(fadeForeground);
+
+        winText = new FlxText(0, 100, 400, "WIN!!!");
+        winText.setFormat(null, 85, 0xffff0000, "center");
+        winText.visible = false;
+        add(winText);
     }
 
     @Override
@@ -74,9 +90,42 @@ public class GameState extends FlxState {
     }
 
     @Override
-    public void draw() {
-        super.draw();
+    public void onLevelCompleted() {
+        fadeForeground.visible = true;
+        fadeForeground.setAlpha(0);
 
-        world.draw();
+        winText.visible = true;
+        winText.scale.make(.1f, .1f);
+
+        Timeline.createParallel()
+                .beginParallel()
+                .push(Tween.to(fadeForeground, TweenSprite.ALPHA, 1f)
+                        .target(.75f)
+                        .ease(TweenEquations.easeOutExpo))
+                .push(Tween.to(winText, TweenSprite.SCALE_XY, 1f)
+                        .target(1.2f, 1.2f)
+                        .ease(TweenEquations.easeOutExpo))
+                .setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> baseTween) {
+                        if (type == COMPLETE) {
+                            winText.visible = true;
+                            Tween.to(winText, TweenSprite.SCALE_XY, 1f)
+                                    .target(1, 1)
+                                    .ease(TweenEquations.easeInOutQuad)
+                                    .repeatYoyo(Tween.INFINITY, 0)
+                                    .start(TweenPlugin.manager);
+                        }
+                    }
+                })
+                .setCallbackTriggers(TweenCallback.COMPLETE)
+                .start(TweenPlugin.manager);
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+
+        TweenPlugin.manager.killAll();
     }
 }
