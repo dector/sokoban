@@ -28,10 +28,7 @@ package io.github.dector.sokoban.states;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenEquations;
 import io.github.dector.sokoban.SokobanGame;
-import io.github.dector.sokoban.util.ColorUtils;
-import io.github.dector.sokoban.util.LevelSet;
-import io.github.dector.sokoban.util.SpriteColorAccessor;
-import io.github.dector.sokoban.util.Input;
+import io.github.dector.sokoban.util.*;
 import org.flixel.*;
 import org.flixel.event.IFlxCamera;
 import org.flixel.plugin.tweens.TweenPlugin;
@@ -128,6 +125,7 @@ public class MenuState extends FlxState {
             }
 
             setButtonSelected(selectedItemIndex, true, true);
+            FlxG.play(Audio.Sounds.MENU_ITEM_MOVED.file);
         }
         if (input.upPressed()) {
             setButtonSelected(selectedItemIndex, false, true);
@@ -138,11 +136,13 @@ public class MenuState extends FlxState {
             }
 
             setButtonSelected(selectedItemIndex, true, true);
+            FlxG.play(Audio.Sounds.MENU_ITEM_MOVED.file);
         }
         if (input.actionPressed()) {
             MenuButton menuButton = (MenuButton) menu.members.get(selectedItemIndex);
             menuButton.flicker(.3f);
             menuButton.item.onSelected();
+            FlxG.play(Audio.Sounds.MENU_ITEM_SELECTED.file);
         }
     }
 

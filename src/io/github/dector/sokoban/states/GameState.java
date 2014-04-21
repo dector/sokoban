@@ -98,16 +98,16 @@ public class GameState extends FlxState implements LevelEventCallback {
             SokobanGame.exit();
         }
 
-        if (input.leftPressed()) {
+        if (input.left()) {
             world.tryMovePlayer(World.Direction.LEFT);
         }
-        if (input.rightPressed()) {
+        if (input.right()) {
             world.tryMovePlayer(World.Direction.RIGHT);
         }
-        if (input.upPressed()) {
+        if (input.up()) {
             world.tryMovePlayer(World.Direction.UP);
         }
-        if (input.downPressed()) {
+        if (input.down()) {
             world.tryMovePlayer(World.Direction.DOWN);
         }
         if (input.isDebugPressed()) {

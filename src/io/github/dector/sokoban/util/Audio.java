@@ -25,47 +25,27 @@
  */
 package io.github.dector.sokoban.util;
 
-import org.flixel.FlxG;
+public class Audio {
 
-public class Input {
+    public enum Sounds {
+        MENU_ITEM_MOVED("assets/sounds/menu_item_move.wav"),
+        MENU_ITEM_SELECTED("assets/sounds/menu_item_select.wav");
 
-    public boolean left() {
-        return FlxG.keys.LEFT;
+        public final String file;
+
+        Sounds(String file) {
+            this.file = file;
+        }
     }
 
-    public boolean right() {
-        return FlxG.keys.RIGHT;
+    public enum Music {
+        MENU("assets/music/menu.mp3"), GAME("assets/music/game.mp3");
+
+        public final String file;
+
+        Music(String file) {
+            this.file = file;
+        }
     }
 
-    public boolean up() {
-        return FlxG.keys.UP;
-    }
-
-    public boolean down() {
-        return FlxG.keys.DOWN;
-    }
-
-    public boolean leftPressed() {
-        return FlxG.keys.justPressed("LEFT");
-    }
-
-    public boolean rightPressed() {
-        return FlxG.keys.justPressed("RIGHT");
-    }
-
-    public boolean upPressed() {
-        return FlxG.keys.justPressed("UP");
-    }
-
-    public boolean downPressed() {
-        return FlxG.keys.justPressed("DOWN");
-    }
-
-    public boolean actionPressed() {
-        return FlxG.keys.justPressed("X");
-    }
-
-    public boolean isDebugPressed() {
-        return FlxG.keys.justPressed("F2");
-    }
 }
