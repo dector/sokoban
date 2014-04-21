@@ -25,10 +25,15 @@
  */
 package io.github.dector.sokoban.states;
 
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenEquations;
 import io.github.dector.sokoban.SokobanGame;
+import io.github.dector.sokoban.util.ColorUtils;
+import io.github.dector.sokoban.util.SpriteColorAccessor;
 import io.github.dector.sokoban.util.Input;
 import org.flixel.*;
 import org.flixel.event.IFlxCamera;
+import org.flixel.plugin.tweens.TweenPlugin;
 
 public class MenuState extends FlxState {
 
@@ -86,7 +91,11 @@ public class MenuState extends FlxState {
     @Override
     public void create() {
         FlxG.mouse.show();
-        FlxG.setBgColor(0xffaaaaaa);
+        // TODO draw circular gradient
+        FlxG.setBgColor(0xff191919);
+
+        FlxG.addPlugin(TweenPlugin.class);
+        Tween.registerAccessor(MenuButton.class, new SpriteColorAccessor());
 
         input = new Input();
 
@@ -102,7 +111,7 @@ public class MenuState extends FlxState {
         }
         add(menu);
 
-        setButtonSelected(selectedItemIndex, true);
+        setButtonSelected(selectedItemIndex, true, false);
     }
 
     @Override
@@ -110,34 +119,39 @@ public class MenuState extends FlxState {
         super.update();
 
         if (input.downPressed()) {
-            setButtonSelected(selectedItemIndex, false);
+            setButtonSelected(selectedItemIndex, false, true);
 
             selectedItemIndex++;
             if (selectedItemIndex >= menu.length) {
                 selectedItemIndex = 0;
             }
 
-            setButtonSelected(selectedItemIndex, true);
+            setButtonSelected(selectedItemIndex, true, true);
         }
         if (input.upPressed()) {
-            setButtonSelected(selectedItemIndex, false);
+            setButtonSelected(selectedItemIndex, false, true);
 
             selectedItemIndex--;
             if (selectedItemIndex < 0) {
                 selectedItemIndex = menu.length - 1;
             }
 
-            setButtonSelected(selectedItemIndex, true);
+            setButtonSelected(selectedItemIndex, true, true);
         }
         if (input.actionPressed()) {
-            Item item = Item.values()[selectedItemIndex];
-            item.onSelected();
+            MenuButton menuButton = (MenuButton) menu.members.get(selectedItemIndex);
+            menuButton.flicker(.3f);
+            menuButton.item.onSelected();
         }
     }
 
-    private void setButtonSelected(int index, boolean selected) {
+    private void setButtonSelected(int index, boolean selected, boolean animate) {
         MenuButton menuButton = (MenuButton) menu.members.get(index);
-        menuButton.setSelected(selected);
+        if (animate) {
+            menuButton.animateSelected(selected);
+        } else {
+            menuButton.setSelected(selected);
+        }
     }
 
     private MenuButton newButtonCentered(int cx, int y, Item item) {
@@ -148,8 +162,8 @@ public class MenuState extends FlxState {
 
     private static class MenuButton extends FlxText {
 
-        private static final int COLOR_NORMAL = 0xff494949;
-        private static final int COLOR_SELECTED = 0xffffffff;
+        private static final int COLOR_NORMAL = 0x797979;
+        private static final int COLOR_SELECTED = 0xffffff;
 
         public final Item item;
 
@@ -162,6 +176,15 @@ public class MenuState extends FlxState {
 
         public void setSelected(boolean selected) {
             setColor(selected ? COLOR_SELECTED : COLOR_NORMAL);
+        }
+
+        public void animateSelected(boolean selected) {
+            int[] rgb = ColorUtils.parseColor(selected ? COLOR_SELECTED : COLOR_NORMAL);
+
+            Tween.to(this, SpriteColorAccessor.ALL, .5f)
+                    .target(rgb[0], rgb[1], rgb[2])
+                    .ease(TweenEquations.easeInOutSine)
+                    .start(TweenPlugin.manager);
         }
     }
 }
