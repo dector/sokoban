@@ -149,14 +149,14 @@ public class World extends FlxGroup {
 
             if ("Player".equals(objName)) {
                 player.loadGraphic(Settings.PLAYER_SKIN.getAssetFile(), true, false, TILE_SIZE);
-                player.addAnimation("stand_down",   new int[]{  0,  8,        }, 1, true);
-                player.addAnimation("walk_down",    new int[]{  1,  9, 17,    }, 3, true);
-                player.addAnimation("stand_left",   new int[]{  2, 10,        }, 1, true);
-                player.addAnimation("walk_left",    new int[]{  3, 11, 19,    }, 3, true);
-                player.addAnimation("stand_right",  new int[]{  4, 12,        }, 1, true);
-                player.addAnimation("walk_right",   new int[]{  5, 13, 21,    }, 3, true);
-                player.addAnimation("stand_up",     new int[]{  6, 14,        }, 1, true);
-                player.addAnimation("walk_up",      new int[]{  7, 15, 23,    }, 3, true);
+                player.addAnimation("stand_down",   new int[]{  0,  8,        },  1, true);
+                player.addAnimation("walk_down",    new int[]{  1,  9, 17,    }, 12, true);
+                player.addAnimation("stand_left",   new int[]{  2, 10,        },  1, true);
+                player.addAnimation("walk_left",    new int[]{  3, 11, 19,    }, 12, true);
+                player.addAnimation("stand_right",  new int[]{  4, 12,        },  1, true);
+                player.addAnimation("walk_right",   new int[]{  5, 13, 21,    }, 12, true);
+                player.addAnimation("stand_up",     new int[]{  6, 14,        },  1, true);
+                player.addAnimation("walk_up",      new int[]{  7, 15, 23,    }, 12, true);
                 player.x = ((RectangleMapObject) obj).getRectangle().getX();
                 player.y = ((RectangleMapObject) obj).getRectangle().getY() - TILE_SIZE;
                 player.setFacing(FlxObject.DOWN);
