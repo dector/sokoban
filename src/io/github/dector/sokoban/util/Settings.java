@@ -29,7 +29,7 @@ public class Settings {
 
     // Debug
     public static final boolean DEBUG_ENABLED = true;
-    public static final boolean LOG_ENABLED = DEBUG_ENABLED && false;
+    public static final boolean LOG_ENABLED = DEBUG_ENABLED && true;
 
     // Graphics
     public static final PlayerSkin PLAYER_SKIN = PlayerSkin.PANK;

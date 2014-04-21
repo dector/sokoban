@@ -71,8 +71,6 @@ public class GameState extends FlxState {
         if (input.downPressed()) {
             world.tryMovePlayer(World.Direction.DOWN);
         }
-
-        world.update();
     }
 
     @Override

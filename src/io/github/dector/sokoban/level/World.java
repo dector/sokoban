@@ -106,9 +106,10 @@ public class World extends FlxGroup {
     private FlxSprite player;
 
     private FlxGroup boxes;
-    private FlxObject[][] boxesMap;
+    private FlxObject[][] boxesMask;
 
     private FlxGroup holders;
+    private FlxPoint[] holdersMask;
 
     private FlxTilemap level;
 
@@ -131,7 +132,7 @@ public class World extends FlxGroup {
 
         boxes = new FlxGroup();
         add(boxes);
-        boxesMap = new FlxObject[level.widthInTiles][level.heightInTiles];
+        boxesMask = new FlxObject[level.widthInTiles][level.heightInTiles];
 
         player = new FlxSprite();
         add(player);
@@ -141,7 +142,7 @@ public class World extends FlxGroup {
 
             if ("Player".equals(objName)) {
                 player.loadGraphic(Settings.PLAYER_SKIN.getAssetFile(), true, false, TILE_SIZE);
-                player.addAnimation("stand_down", new int[]{0, 8,}, 1, true);
+                player.addAnimation("stand_down",   new int[]{  0,  8,        }, 1, true);
                 player.addAnimation("walk_down",    new int[]{  1,  9, 17,    }, 3, true);
                 player.addAnimation("stand_left",   new int[]{  2, 10,        }, 1, true);
                 player.addAnimation("walk_left",    new int[]{  3, 11, 19,    }, 3, true);
@@ -159,7 +160,7 @@ public class World extends FlxGroup {
                 box.x = ((RectangleMapObject) obj).getRectangle().getX();
                 box.y = ((RectangleMapObject) obj).getRectangle().getY() - TILE_SIZE;
                 boxes.add(box);
-                boxesMap[(int) box.x / TILE_SIZE][(int) box.y / TILE_SIZE] = box;
+                boxesMask[(int) box.x / TILE_SIZE][(int) box.y / TILE_SIZE] = box;
             } else if ("Holder".equals(objName)) {
                 FlxSprite holder = new FlxSprite();
                 holder.loadGraphic("assets/holder.png");
@@ -167,7 +168,38 @@ public class World extends FlxGroup {
                 holder.y = ((RectangleMapObject) obj).getRectangle().getY() - TILE_SIZE;
                 holders.add(holder);
             }
+
+            holdersMask = new FlxPoint[holders.members.size];
+            for (int i = 0; i < holders.members.size; i++) {
+                FlxSprite holder = (FlxSprite) holders.members.get(i);
+                FlxPoint p = new FlxPoint(holder.x / TILE_SIZE, holder.y / TILE_SIZE);
+                holdersMask[i] = p;
+            }
         }
+    }
+
+    @Override
+    public void postUpdate() {
+        super.postUpdate();
+
+        if (checkBoxesPlaced()) {
+            // WIN
+            Log.d("Win!");
+        }
+    }
+
+    private boolean checkBoxesPlaced() {
+        boolean result = true;
+
+        for (int i = 0; i < holdersMask.length && result; i++) {
+            FlxPoint p = holdersMask[i];
+
+            if (boxesMask[(int) p.x][(int) p.y] == null) {
+                result = false;
+            }
+        }
+
+        return result;
     }
 
     public void tryMovePlayer(Direction direction) {
@@ -238,7 +270,7 @@ public class World extends FlxGroup {
         if (indexInRow <= MAX_BOXES_IN_ROW_PUSH
                 && ! isMapTileSolid(currentX, currentY)
                 && isBoxCoordsValid(currentX, currentY)) {
-            final FlxObject currentBox = boxesMap[currentX][currentY];
+            final FlxObject currentBox = boxesMask[currentX][currentY];
 
             if (currentBox != null) {
                 final int nextX = direction.nextTileX(currentX);
@@ -248,7 +280,7 @@ public class World extends FlxGroup {
 
                 if (isBoxCoordsValid(nextX, nextY)
                         && ! isMapTileSolid(nextX, nextY)) {
-                    final FlxObject nextBox = boxesMap[nextX][nextY];
+                    final FlxObject nextBox = boxesMask[nextX][nextY];
 
                     Log.d("Next object: %s", nextBox);
 
@@ -269,8 +301,8 @@ public class World extends FlxGroup {
                                 @Override
                                 public void onEvent(int event, BaseTween<?> baseTween) {
                                     if (event == TweenCallback.COMPLETE) {
-                                        boxesMap[nextX][nextY] = currentBox;
-                                        boxesMap[currentX][currentY] = null;
+                                        boxesMask[nextX][nextY] = currentBox;
+                                        boxesMask[currentX][currentY] = null;
                                     }
                                 }
                             }
@@ -294,8 +326,8 @@ public class World extends FlxGroup {
     }
 
     private boolean isBoxCoordsValid(int tileX, int tileY) {
-        return 0 <= tileX && tileX < boxesMap.length
-                && 0 <= tileY && tileY < boxesMap[tileX].length;
+        return 0 <= tileX && tileX < boxesMask.length
+                && 0 <= tileY && tileY < boxesMask[tileX].length;
     }
 
     private boolean isMapTileSolid(int tileX, int tileY) {
