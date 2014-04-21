@@ -32,7 +32,7 @@ public class Settings {
     public static final boolean LOG_ENABLED = DEBUG_ENABLED && false;
 
     // Graphics
-    public static final PlayerSkin PLAYER_SKIN = PlayerSkin.MAN;
+    public static final PlayerSkin PLAYER_SKIN = PlayerSkin.PANK;
 
     // Controls
     public static final boolean GAMEPAD_ENABLED = false;

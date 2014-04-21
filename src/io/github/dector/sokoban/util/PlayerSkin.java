@@ -27,7 +27,7 @@ package io.github.dector.sokoban.util;
 
 public enum PlayerSkin {
 
-    MAN("man.png");
+    MAN("man.png"), PANK("pank.png");
 
     public final String assetName;
 
