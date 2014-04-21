@@ -92,6 +92,8 @@ public class World {
     private FlxGroup boxes;
     private FlxObject[][] boxesMap;
 
+    private FlxGroup holders;
+
     private FlxTilemap level;
 
     public World() {
@@ -108,38 +110,47 @@ public class World {
         boxes = new FlxGroup();
         boxesMap = new FlxObject[level.widthInTiles][level.heightInTiles];
 
+        holders = new FlxGroup();
+
         for (MapObject obj : map.getLayers().get("Objects").getObjects()) {
             String objName = obj.getName();
 
             if ("Player".equals(objName)) {
                 player = new FlxSprite();
-                player.makeGraphic(TILE_SIZE, TILE_SIZE, 0xffff0000);
+                player.loadGraphic("assets/player.png", true);
+                player.addAnimation("stand_down", new int[] { 0 }, 0, false);
+                player.addAnimation("walk_down", new int[] { 1, 2 }, 5, true);
+                player.addAnimation("stand_left", new int[] { 3 }, 0, false);
+                player.addAnimation("walk_left", new int[] { 4, 5 }, 5, true);
+                player.addAnimation("stand_right", new int[] { 6 }, 0, false);
+                player.addAnimation("walk_right", new int[] { 7, 8 }, 5, true);
+                player.addAnimation("stand_up", new int[] { 9 }, 0, false);
+                player.addAnimation("walk_up", new int[] { 10, 11 }, 5, true);
                 player.x = ((RectangleMapObject) obj).getRectangle().getX();
                 player.y = ((RectangleMapObject) obj).getRectangle().getY() - TILE_SIZE;
             } else if ("Box".equals(objName)) {
                 FlxSprite box = new FlxSprite();
-                box.makeGraphic(TILE_SIZE, TILE_SIZE, 0xff00ff00);
+                box.loadGraphic("assets/box.png");
                 box.x = ((RectangleMapObject) obj).getRectangle().getX();
                 box.y = ((RectangleMapObject) obj).getRectangle().getY() - TILE_SIZE;
                 boxes.add(box);
                 boxesMap[(int) box.x / TILE_SIZE][(int) box.y / TILE_SIZE] = box;
+            } else if ("Holder".equals(objName)) {
+                FlxSprite holder = new FlxSprite();
+                holder.loadGraphic("assets/holder.png");
+                holder.x = ((RectangleMapObject) obj).getRectangle().getX();
+                holder.y = ((RectangleMapObject) obj).getRectangle().getY() - TILE_SIZE;
+                holders.add(holder);
             }
         }
     }
 
     public void update() {
-        if (player.velocity.x != 0) {
-            player.x += player.velocity.x;
-            player.velocity.x = 0;
-        }
-        if (player.velocity.y != 0) {
-            player.y += player.velocity.y;
-            player.velocity.y = 0;
-        }
     }
 
     public void draw() {
         level.draw();
+        holders.draw();
         boxes.draw();
         player.draw();
     }
@@ -150,10 +161,33 @@ public class World {
         int nextX = direction.nextTileX(tileX);
         int nextY = direction.nextTileY(tileY);
 
-        boolean boxesMoved = tryMoveBox(nextX, nextY, direction, 1);
-        if (boxesMoved) {
+        boolean moved = tryMoveBox(nextX, nextY, direction, 1);
+        if (moved) {
             player.x = nextX * TILE_SIZE;
             player.y = nextY * TILE_SIZE;
+        }
+
+        updatePlayer(direction);
+    }
+
+    private void updatePlayer(Direction direction) {
+        switch (direction) {
+            case LEFT:
+                player.play("stand_left");
+                player.setFacing(FlxObject.LEFT);
+                break;
+            case RIGHT:
+                player.play("stand_right");
+                player.setFacing(FlxObject.RIGHT);
+                break;
+            case UP:
+                player.play("stand_up");
+                player.setFacing(FlxSprite.UP);
+                break;
+            case DOWN:
+                player.play("stand_down");
+                player.setFacing(FlxObject.DOWN);
+                break;
         }
     }
 
